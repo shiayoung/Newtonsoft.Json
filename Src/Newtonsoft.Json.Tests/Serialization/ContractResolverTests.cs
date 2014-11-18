@@ -551,6 +551,34 @@ namespace Newtonsoft.Json.Tests.Serialization
 }", startingWithB);
         }
 
+#if VS14
+        public class ReadonlyPropertiesTestClass
+        {
+            public string ReadonlyString { get; }
+            public int ReadonlyInteger { get; }
+
+            public ReadonlyPropertiesTestClass(string readonlyString, int readonlyInteger)
+            {
+                ReadonlyString = readonlyString;
+                ReadonlyInteger = readonlyInteger;
+            }
+        }
+
+        [Test]
+        public void ReadonlyPropertiesTest()
+        {
+            DefaultContractResolver contractResolver = new DefaultContractResolver();
+
+            JsonObjectContract contract = (JsonObjectContract) contractResolver.ResolveContract(typeof (ReadonlyPropertiesTestClass));
+
+            JsonProperty p1 = contract.Properties["ReadonlyString"];
+            Assert.AreEqual(false, p1.Writable);
+
+            JsonProperty p2 = contract.Properties["ReadonlyInteger"];
+            Assert.AreEqual(false, p2.Writable);
+        }
+#endif
+
 #if !(NETFX_CORE || PORTABLE || ASPNETCORE50 || PORTABLE40)
 #pragma warning disable 618
         [Test]

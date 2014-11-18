@@ -95,6 +95,38 @@ namespace Newtonsoft.Json.Tests.Serialization
     [TestFixture]
     public class JsonSerializerTest : TestFixtureBase
     {
+ #if VS14
+       public class ReadonlyPropertiesTestClass
+        {
+            public string ReadonlyString { get; }
+            public int ReadonlyInteger { get; }
+
+            public ReadonlyPropertiesTestClass(string readonlyString, int readonlyInteger)
+            {
+                ReadonlyString = readonlyString;
+                ReadonlyInteger = readonlyInteger;
+            }
+        }
+
+        [Test]
+        public void ReadonlyPropertiesTest()
+        {
+            var c = new ReadonlyPropertiesTestClass("A string", 42);
+
+            string json = JsonConvert.SerializeObject(c, Formatting.Indented);
+
+            Assert.AreEqual(@"{
+  ""ReadonlyString"": ""A string"",
+  ""ReadonlyInteger"": 42
+}", json);
+
+            var c2 = JsonConvert.DeserializeObject<ReadonlyPropertiesTestClass>(json);
+
+            Assert.AreEqual(c.ReadonlyString, c2.ReadonlyString);
+            Assert.AreEqual(c.ReadonlyInteger, c2.ReadonlyInteger);
+        }
+#endif
+
 #if !(NETFX_CORE || ASPNETCORE50 || NET20)
         [MetadataType(typeof(CustomerValidation))]
         public partial class CustomerWithMetadataType
@@ -1031,7 +1063,7 @@ namespace Newtonsoft.Json.Tests.Serialization
         }
 
         // ignore hiding members compiler warning
-#pragma warning disable 108,114
+#pragma warning disable 108, 114
         [DataContract]
         public class BaseWithContract
         {
@@ -1109,7 +1141,7 @@ namespace Newtonsoft.Json.Tests.Serialization
             [DataMember(Name = "VirtualWithDataMemberSub")]
             public virtual string VirtualWithDataMember { get; set; }
         }
-#pragma warning restore 108,114
+#pragma warning restore 108, 114
 
         [Test]
         public void SubWithoutContractNewPropertiesTest()
